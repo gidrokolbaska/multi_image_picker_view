@@ -12,7 +12,12 @@ class MultiImagePickerController with ChangeNotifier {
   final bool withReadStream;
 
   MultiImagePickerController(
-      {this.allowedImageTypes = const ['png', 'jpeg', 'jpg'],
+      {
+      this.allowedImageTypes = const [
+        'png',
+        'jpeg',
+        'jpg'
+      ],
       this.maxImages = 10,
       this.withData = false,
       this.withReadStream = false,
@@ -37,22 +42,25 @@ class MultiImagePickerController with ChangeNotifier {
   /// It returns [Future] of [bool], true if user has selected images.
   Future<bool> pickImages() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-        allowMultiple: maxImages > 1 ? true : false,
-        type: FileType.image,
-        withData: kIsWeb ? true : withData,
-        withReadStream: kIsWeb ? false : withReadStream,
-        allowedExtensions: allowedImageTypes);
+      allowMultiple: maxImages > 1 ? true : false,
+      type: FileType.image,
+      withData: kIsWeb ? true : withData,
+      withReadStream: kIsWeb ? false : withReadStream,
+      //allowedExtensions: allowedImageTypes,
+    );
     if (result != null && result.files.isNotEmpty) {
-      _addImages(result.files
-          .where((e) =>
-              e.extension != null &&
-              allowedImageTypes.contains(e.extension?.toLowerCase()))
-          .map((e) => ImageFile(UniqueKey().toString(),
-              name: e.name,
-              extension: e.extension!,
-              bytes: e.bytes,
-              readStream: e.readStream,
-              path: !kIsWeb ? e.path : null)));
+      _addImages(
+        result.files.where((e) => e.extension != null && allowedImageTypes.contains(e.extension?.toLowerCase())).map(
+              (e) => ImageFile(
+                UniqueKey().toString(),
+                name: e.name,
+                extension: e.extension!,
+                bytes: e.bytes,
+                readStream: e.readStream,
+                path: !kIsWeb ? e.path : null,
+              ),
+            ),
+      );
       notifyListeners();
       return true;
     }
