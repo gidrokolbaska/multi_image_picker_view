@@ -38,7 +38,7 @@ class MultiImagePickerController with ChangeNotifier {
   Future<bool> pickImages() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
         allowMultiple: maxImages > 1 ? true : false,
-        type: FileType.custom,
+        type: FileType.image,
         withData: kIsWeb ? true : withData,
         withReadStream: kIsWeb ? false : withReadStream,
         allowedExtensions: allowedImageTypes);
