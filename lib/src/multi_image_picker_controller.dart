@@ -44,21 +44,42 @@ class MultiImagePickerController with ChangeNotifier {
       //allowedExtensions: allowedImageTypes,
     );
     if (result != null && result.files.isNotEmpty) {
+      var iterationOne = result.files
+          .where((e) =>
+              e.extension != null &&
+              allowedImageTypes.contains(e.extension?.toLowerCase()))
+          .toList();
+      List<PlatformFile> uniqueList = [];
+      if (_images.isEmpty) {
+        uniqueList.addAll(iterationOne);
+      } else {
+        late bool myBool;
+        uniqueList = iterationOne.where((value) {
+          for (var element in _images) {
+            if (element.path == value.path) {
+              myBool = false;
+              break;
+            } else {
+              myBool = true;
+              continue;
+            }
+          }
+
+          return myBool;
+        }).toList();
+      }
+
       _addImages(
-        result.files
-            .where((e) =>
-                e.extension != null &&
-                allowedImageTypes.contains(e.extension?.toLowerCase()))
-            .map(
-              (e) => ImageFile(
-                UniqueKey().toString(),
-                name: e.name,
-                extension: e.extension!,
-                bytes: e.bytes,
-                readStream: e.readStream,
-                path: !kIsWeb ? e.path : null,
-              ),
-            ),
+        uniqueList.map(
+          (e) => ImageFile(
+            UniqueKey().toString(),
+            name: e.name,
+            extension: e.extension!,
+            bytes: e.bytes,
+            readStream: e.readStream,
+            path: !kIsWeb ? e.path : null,
+          ),
+        ),
       );
       notifyListeners();
       return true;
@@ -68,10 +89,8 @@ class MultiImagePickerController with ChangeNotifier {
 
   void _addImages(Iterable<ImageFile> images) {
     int i = 0;
-    var uniqueImages = _images.skipWhile(
-        (value) => value.path == (images as List<ImageFile>)[i].path);
-    while (_images.length < maxImages && uniqueImages.length > i) {
-      _images.add(uniqueImages.elementAt(i));
+    while (_images.length < maxImages && images.length > i) {
+      _images.add(images.elementAt(i));
       i++;
     }
   }
