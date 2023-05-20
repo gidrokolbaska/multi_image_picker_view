@@ -11,6 +11,7 @@ class MultiImagePickerView extends StatefulWidget {
   const MultiImagePickerView(
       {Key? key,
       required this.controller,
+      this.scrollController,
       this.draggable = true,
       this.showAddMoreButton = true,
       this.showInitialContainer = true,
@@ -45,14 +46,13 @@ class MultiImagePickerView extends StatefulWidget {
   final EdgeInsetsGeometry? padding;
 
   final SliverGridDelegate? gridDelegate;
+  final ScrollController? scrollController;
 
   @override
   State<MultiImagePickerView> createState() => _MultiImagePickerViewState();
 }
 
 class _MultiImagePickerViewState extends State<MultiImagePickerView> {
-  late ScrollController scrollController;
-
   Widget? _selector(BuildContext context) => widget.showAddMoreButton
       ? SizedBox(
           key: const Key("selector"),
@@ -116,7 +116,6 @@ class _MultiImagePickerViewState extends State<MultiImagePickerView> {
   @override
   void initState() {
     super.initState();
-    scrollController = ScrollController();
     widget.controller.addListener(updateUi);
   }
 
@@ -155,7 +154,7 @@ class _MultiImagePickerViewState extends State<MultiImagePickerView> {
           padding: widget.padding ?? EdgeInsets.zero,
           child: ReorderableBuilder(
             key: Key(gridViewKey.toString()),
-            scrollController: scrollController,
+            scrollController: widget.scrollController,
             enableDraggable: widget.draggable,
             dragChildBoxDecoration: widget.onDragBoxDecoration ??
                 BoxDecoration(
@@ -181,7 +180,7 @@ class _MultiImagePickerViewState extends State<MultiImagePickerView> {
             builder: (children) {
               return GridView(
                 key: gridViewKey,
-                controller: scrollController,
+                controller: widget.scrollController,
                 shrinkWrap: true,
                 gridDelegate: widget.gridDelegate ??
                     const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -236,7 +235,6 @@ class _MultiImagePickerViewState extends State<MultiImagePickerView> {
   @override
   void dispose() {
     widget.controller.removeListener(updateUi);
-    scrollController.dispose();
     super.dispose();
   }
 }
