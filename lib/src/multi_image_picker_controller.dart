@@ -12,12 +12,7 @@ class MultiImagePickerController with ChangeNotifier {
   final bool withReadStream;
 
   MultiImagePickerController(
-      {
-      this.allowedImageTypes = const [
-        'png',
-        'jpeg',
-        'jpg'
-      ],
+      {this.allowedImageTypes = const ['png', 'jpeg', 'jpg'],
       this.maxImages = 10,
       this.withData = false,
       this.withReadStream = false,
@@ -50,7 +45,11 @@ class MultiImagePickerController with ChangeNotifier {
     );
     if (result != null && result.files.isNotEmpty) {
       _addImages(
-        result.files.where((e) => e.extension != null && allowedImageTypes.contains(e.extension?.toLowerCase())).map(
+        result.files
+            .where((e) =>
+                e.extension != null &&
+                allowedImageTypes.contains(e.extension?.toLowerCase()))
+            .map(
               (e) => ImageFile(
                 UniqueKey().toString(),
                 name: e.name,
@@ -69,8 +68,10 @@ class MultiImagePickerController with ChangeNotifier {
 
   void _addImages(Iterable<ImageFile> images) {
     int i = 0;
-    while (_images.length < maxImages && images.length > i) {
-      _images.add(images.elementAt(i));
+    var uniqueImages = _images.skipWhile(
+        (value) => value.path == (images as List<ImageFile>)[i].path);
+    while (_images.length < maxImages && uniqueImages.length > i) {
+      _images.add(uniqueImages.elementAt(i));
       i++;
     }
   }
